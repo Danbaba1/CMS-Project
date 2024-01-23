@@ -1,17 +1,18 @@
-import express  from 'express';
-import path  from 'path';
-import {engine} from 'express-handlebars';
-import mongoose  from 'mongoose';
-import bodyParser  from 'body-parser';
-import methodOverride  from 'method-override';
-import upload  from 'express-fileupload';
-import session  from 'express-session';
-import flash  from 'connect-flash';
-import {mongoDbUrl} from './config/database.js';
-import passport  from 'passport';
-import {allowInsecurePrototypeAccess} from '@handlebars/allow-prototype-access';
-import Handlebars  from 'handlebars';
+import express from 'express';
+import path from 'path';
+import { engine } from 'express-handlebars';
+import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
+import methodOverride from 'method-override';
+import upload from 'express-fileupload';
+import session from 'express-session';
+import flash from 'connect-flash';
+import { mongoDbUrl } from './config/database.js';
+import passport from 'passport';
+import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access';
+import Handlebars from 'handlebars';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 import * as punycode from 'punycode';
 
 
@@ -23,11 +24,11 @@ const app = express()
 
 mongoose.set('strictQuery', false);
 
-mongoose.connect(mongoDbUrl).then(db=>{
-
-    console.log('MONGO connected');
-     
-}).catch(error=> console.log(error));
+mongoose.connect(mongoDbUrl).then(() => {
+    console.log('Connected to MongoDB');
+  }).catch((error) => {
+    console.error('Error connecting to MongoDB:', error);
+  });
 
 
 
@@ -36,9 +37,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Set View Engine
 
-import {select, generateDate, paginate} from './helpers/handlebars-helpers.js';
-app.engine('handlebars', engine({handlebars:allowInsecurePrototypeAccess(Handlebars),defaultLayout: 'home',
- helpers: {select: select, generateDate: generateDate, paginate: paginate}}));
+import { select, generateDate, paginate } from './helpers/handlebars-helpers.js';
+app.engine('handlebars', engine({
+    handlebars: allowInsecurePrototypeAccess(Handlebars), defaultLayout: 'home',
+    helpers: { select: select, generateDate: generateDate, paginate: paginate }
+}));
 app.set('view engine', 'handlebars');
 
 // Upload Middleware
@@ -47,7 +50,7 @@ app.use(upload());
 
 // Body Parser
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Method Override
@@ -69,7 +72,7 @@ app.use(passport.session());
 
 // Local variables using Middleware
 
-app.use((req, res, next)=>{
+app.use((req, res, next) => {
 
     res.locals.user = req.user || null;
     res.locals.success_message = req.flash('success_message');
@@ -98,7 +101,7 @@ app.use('/admin/posts', posts);
 app.use('/admin/categories', categories);
 app.use('/admin/comments', comments);
 
-app.listen(4500, ()=>{
+app.listen(4500, () => {
 
     console.log(`listening on port 4500`);
 
